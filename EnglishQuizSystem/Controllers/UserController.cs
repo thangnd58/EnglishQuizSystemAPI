@@ -4,6 +4,7 @@ using EnglishQuizSystem.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace EnglishQuizSystem.Controllers
 {
@@ -21,11 +22,9 @@ namespace EnglishQuizSystem.Controllers
             _mapper = mapper;
         }
 
-        /// <summary>
-        /// Get list of all users.
-        /// </summary>
         [HttpGet]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "ADMIN")]
+        [EnableQuery]
         public IActionResult Get()
         {
             try

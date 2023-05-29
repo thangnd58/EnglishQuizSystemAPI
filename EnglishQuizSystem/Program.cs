@@ -1,6 +1,9 @@
 using EnglishQuizSystem.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.OData;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using System.Text;
 
 namespace EnglishQuizSystem
@@ -11,8 +14,7 @@ namespace EnglishQuizSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddOData(option => option.Select().Filter().Count().OrderBy().Expand().SetMaxTop(100).AddRouteComponents("odata", GetEdmModel()));
 
 
             builder.Services.AddAuthentication(options =>
@@ -31,19 +33,20 @@ namespace EnglishQuizSystem
                 };
             });
             builder.Services.AddAuthorization();
-            // Add configuration from appsettings.json
+
             builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();//
+            builder.Services.AddEndpointsApiExplorer();
+
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             builder.Services.AddDbContext<EnglishQuizSystemContext>();
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -56,6 +59,14 @@ namespace EnglishQuizSystem
             app.MapControllers();//
 
             app.Run();
+        }
+
+        private static IEdmModel GetEdmModel()
+        {
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntitySet<User>("Users");
+            builder.EntitySet<Role>("Roles");
+            return builder.GetEdmModel();
         }
     }
 }

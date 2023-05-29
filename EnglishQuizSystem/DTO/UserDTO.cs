@@ -1,4 +1,6 @@
-﻿namespace EnglishQuizSystem.DTO
+﻿using EnglishQuizSystem.Models;
+
+namespace EnglishQuizSystem.DTO
 {
     public class UserDTO
     {
