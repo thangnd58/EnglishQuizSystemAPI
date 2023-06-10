@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33712.159
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnglishQuizSystem", "EnglishQuizSystem\EnglishQuizSystem.csproj", "{71A54442-57EC-4A2F-8C0D-170D63B9285B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnglishQuizSystem", "EnglishQuizSystem\EnglishQuizSystem.csproj", "{71A54442-57EC-4A2F-8C0D-170D63B9285B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnglishQuizSystemClient", "EnglishQuizSystemClient\EnglishQuizSystemClient.csproj", "{6D99F6E4-FC5D-4320-B495-F3A00B0B9C89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{71A54442-57EC-4A2F-8C0D-170D63B9285B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71A54442-57EC-4A2F-8C0D-170D63B9285B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71A54442-57EC-4A2F-8C0D-170D63B9285B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D99F6E4-FC5D-4320-B495-F3A00B0B9C89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D99F6E4-FC5D-4320-B495-F3A00B0B9C89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D99F6E4-FC5D-4320-B495-F3A00B0B9C89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D99F6E4-FC5D-4320-B495-F3A00B0B9C89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,6 +9,10 @@ namespace EnglishQuizSystem.Mapper
         public AutoMapperProfile()
         {
             CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<Role, RoleDTO>().ReverseMap();
+            CreateMap<Quiz, QuizDTO>().ReverseMap();
+            CreateMap<Question, QuestionDTO>().ReverseMap();
+            CreateMap<Answer, AnswerDTO>().ReverseMap();
         }
     }
 }

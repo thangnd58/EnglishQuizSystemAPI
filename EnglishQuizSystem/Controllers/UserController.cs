@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.OData.Query;
 
 namespace EnglishQuizSystem.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -69,7 +68,7 @@ namespace EnglishQuizSystem.Controllers
                 {
                     if (_context.Users.FirstOrDefault(u => u.UserName.Equals(user.UserName)) != null) 
                         return BadRequest("User name already exist.");
-                    _context.Add(_mapper.Map<User>(user));
+                    _context.Users.Add(_mapper.Map<User>(user));
                     _context.SaveChanges();
                     return Ok("Insert Successfully.");
                 }

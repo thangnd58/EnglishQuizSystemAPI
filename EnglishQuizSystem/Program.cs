@@ -15,7 +15,12 @@ namespace EnglishQuizSystem
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddControllers().AddOData(option => option.Select().Filter().Count().OrderBy().Expand().SetMaxTop(100).AddRouteComponents("odata", GetEdmModel()));
-
+            builder.Services.AddCors(
+                    p => p.AddPolicy("MyCors", build =>
+                    {
+                        build.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    })
+                );
 
             builder.Services.AddAuthentication(options =>
             {
@@ -52,10 +57,10 @@ namespace EnglishQuizSystem
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
             app.UseAuthorization();
             app.UseAuthentication();
-
+            
+            app.UseCors("MyCors");
             app.MapControllers();//
 
             app.Run();
@@ -66,7 +71,10 @@ namespace EnglishQuizSystem
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             builder.EntitySet<User>("Users");
             builder.EntitySet<Role>("Roles");
-            return builder.GetEdmModel();
+			builder.EntitySet<Quiz>("Quizs");
+			builder.EntitySet<Question>("Questions");
+			builder.EntitySet<Answer>("Answers");
+			return builder.GetEdmModel();
         }
     }
 }
