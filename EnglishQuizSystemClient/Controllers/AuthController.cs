@@ -39,6 +39,7 @@ namespace EnglishQuizSystemClient.Controllers
 								// Access properties of the JSON object as needed
 								string token = jsonData["token"].ToString();
 								HttpContext.Session.SetString("token", token);
+								HttpContext.Session.SetString("username", username);
 								return RedirectToAction("Index", "Home");
 							}
 							else
@@ -112,7 +113,8 @@ namespace EnglishQuizSystemClient.Controllers
 		public IActionResult Logout()
 		{
 			HttpContext.Session.Remove("token");
-			return RedirectToAction("Index", "Home");
+            HttpContext.Session.Remove("username");
+            return RedirectToAction("Index", "Home");
 		}
 	}
 }

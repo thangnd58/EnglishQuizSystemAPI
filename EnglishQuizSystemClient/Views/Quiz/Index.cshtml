@@ -1,16 +1,20 @@
-﻿@ViewBag.Message
+﻿
+<h1>@ViewBag.Message</h1>
 @if (ViewBag.ListQuestion != null)
 {
+    <h1>@ViewBag.Quiz.Name</h1>
     <div class="formbold-main-wrapper">
-
         <div class="formbold-form-wrapper">
-            <div>Quiz Name</div>
-            <form method="post" action="@Url.Action("Submit", "Quiz")">
+            <form method="post" action="@Url.Action("Submit", "Quiz")" onsubmit="return validateForm()">
+                <input type="hidden" value="ViewBag.Quiz.Id" name="quizId" />
+                @{
+                    var questionNumber = 1;
+                }
                 @foreach (var q in ViewBag.ListQuestion)
                 {
                     <div class="formbold-mb-5">
                         <label for="qusOne" class="formbold-form-label">
-                            @q.Text
+                            <h4><span>@questionNumber</span>.<span>@q.Text</span></h4>
                         </label>
 
                         @if (q.Type)
@@ -43,6 +47,9 @@
                                 }
                             </div>
                         }
+                        @{
+                            questionNumber++;
+                        }
                     </div>
                 }
                 <button class="formbold-btn">Submit</button>
@@ -50,6 +57,40 @@
         </div>
     </div>
 }
+<script>
+    function validateForm() {
+        var questions = document.getElementsByClassName("formbold-mb-5");
+
+        for (var i = 0; i < questions.length; i++) {
+            var radios = questions[i].querySelectorAll('input[type="radio"]');
+            var checkboxes = questions[i].querySelectorAll('input[type="checkbox"]');
+            var answered = false;
+
+            if (radios.length > 0) {
+                for (var j = 0; j < radios.length; j++) {
+                    if (radios[j].checked) {
+                        answered = true;
+                        break;
+                    }
+                }
+            } else if (checkboxes.length > 0) {
+                for (var j = 0; j < checkboxes.length; j++) {
+                    if (checkboxes[j].checked) {
+                        answered = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!answered) {
+                alert("Please select an answer for question " + (i + 1));
+                return false;
+            }
+        }
+
+        return true;
+    }
+</script>
 <style>
     /*import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');*/
 
@@ -65,17 +106,16 @@
 
     .formbold-main-wrapper {
         display: flex;
-        align-items: center;
-        justify-content: center;
+        align-items: start;
+        justify-content: start;
         padding: 48px;
     }
 
     .formbold-form-wrapper {
         margin: 0 auto;
-        max-width: 570px;
+        max-width: 100%;
         width: 100%;
         background: white;
-        padding: 40px;
     }
 
     .formbold-img {

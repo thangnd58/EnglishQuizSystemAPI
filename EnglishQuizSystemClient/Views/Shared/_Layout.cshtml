@@ -1,6 +1,7 @@
 ﻿@using Newtonsoft.Json;
 @{
 	string token = Context.Session.GetString("token");
+	string username = Context.Session.GetString("username");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -34,7 +35,7 @@
 						} else
 						{
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Logout">Logout</a>
+								<a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Logout">@username (Logout)</a>
 							</li>
 						}
 					</ul>

@@ -8,6 +8,7 @@ namespace EnglishQuizSystem.Models
         public Quiz()
         {
             Questions = new HashSet<Question>();
+            UserAnswers = new HashSet<UserAnswer>();
             UserQuizzes = new HashSet<UserQuiz>();
         }
 
@@ -17,6 +18,7 @@ namespace EnglishQuizSystem.Models
         public bool? Active { get; set; }
 
         public virtual ICollection<Question> Questions { get; set; }
+        public virtual ICollection<UserAnswer> UserAnswers { get; set; }
         public virtual ICollection<UserQuiz> UserQuizzes { get; set; }
     }
 }

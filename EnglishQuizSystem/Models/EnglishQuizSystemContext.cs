@@ -29,8 +29,8 @@ namespace EnglishQuizSystem.Models
             if (!optionsBuilder.IsConfigured)
             {
                 var builder = new ConfigurationBuilder()
-                              .SetBasePath(Directory.GetCurrentDirectory())
-                              .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                               .SetBasePath(Directory.GetCurrentDirectory())
+                               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
                 IConfigurationRoot configuration = builder.Build();
                 optionsBuilder.UseSqlServer(configuration.GetConnectionString("MyConStr"));
             }
@@ -55,7 +55,7 @@ namespace EnglishQuizSystem.Models
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p.Answers)
                     .HasForeignKey(d => d.QuestionId)
-                    .HasConstraintName("FK__answer__question__534D60F1");
+                    .HasConstraintName("FK__answer__question__5812160E");
             });
 
             modelBuilder.Entity<Question>(entity =>
@@ -79,7 +79,7 @@ namespace EnglishQuizSystem.Models
                 entity.HasOne(d => d.Quiz)
                     .WithMany(p => p.Questions)
                     .HasForeignKey(d => d.QuizId)
-                    .HasConstraintName("FK__question__quiz_i__5070F446");
+                    .HasConstraintName("FK__question__quiz_i__59063A47");
             });
 
             modelBuilder.Entity<Quiz>(entity =>
@@ -116,7 +116,7 @@ namespace EnglishQuizSystem.Models
             {
                 entity.ToTable("user");
 
-                entity.HasIndex(e => e.UserName, "UQ__user__7C9273C40FA9F6A6")
+                entity.HasIndex(e => e.UserName, "UQ__user__7C9273C469183D65")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("id");
@@ -136,12 +136,12 @@ namespace EnglishQuizSystem.Models
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.RoleId)
-                    .HasConstraintName("FK__user__role_id__4BAC3F29");
+                    .HasConstraintName("FK__user__role_id__59FA5E80");
             });
 
             modelBuilder.Entity<UserAnswer>(entity =>
             {
-                entity.HasKey(e => new { e.UserId, e.QuestionId, e.AnswerId })
+                entity.HasKey(e => new { e.UserId, e.QuestionId, e.AnswerId, e.QuizId })
                     .HasName("user_answer_pk");
 
                 entity.ToTable("user_answer");
@@ -152,23 +152,31 @@ namespace EnglishQuizSystem.Models
 
                 entity.Property(e => e.AnswerId).HasColumnName("answer_id");
 
+                entity.Property(e => e.QuizId).HasColumnName("quiz_id");
+
                 entity.HasOne(d => d.Answer)
                     .WithMany(p => p.UserAnswers)
                     .HasForeignKey(d => d.AnswerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__user_answ__answe__5812160E");
+                    .HasConstraintName("FK__user_answ__answe__5AEE82B9");
 
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p.UserAnswers)
                     .HasForeignKey(d => d.QuestionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__user_answ__quest__571DF1D5");
+                    .HasConstraintName("FK__user_answ__quest__5BE2A6F2");
+
+                entity.HasOne(d => d.Quiz)
+                    .WithMany(p => p.UserAnswers)
+                    .HasForeignKey(d => d.QuizId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__user_answ__quiz___5CD6CB2B");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.UserAnswers)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__user_answ__user___5629CD9C");
+                    .HasConstraintName("FK__user_answ__user___5DCAEF64");
             });
 
             modelBuilder.Entity<UserQuiz>(entity =>
@@ -188,13 +196,13 @@ namespace EnglishQuizSystem.Models
                     .WithMany(p => p.UserQuizzes)
                     .HasForeignKey(d => d.QuizId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__user_quiz__quiz___5BE2A6F2");
+                    .HasConstraintName("FK__user_quiz__quiz___5EBF139D");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.UserQuizzes)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__user_quiz__user___5AEE82B9");
+                    .HasConstraintName("FK__user_quiz__user___5FB337D6");
             });
 
             OnModelCreatingPartial(modelBuilder);
