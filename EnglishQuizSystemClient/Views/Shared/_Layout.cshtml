@@ -78,7 +78,7 @@
 				$.each(data, function (index, quiz) {
 					const row = $("<tr/>");
 					row.append($("<td/>").text(quiz.id));
-					row.append($("<td/>").text(quiz.name));
+					row.append($("<td/>").append($("<a/>").attr("href", `/Quiz?id=${quiz.id}`).text(quiz.name)));
 					publisherList.append(row);
 				});
 			},
@@ -105,7 +105,7 @@
 					$.each(data, function (index, quiz) {
 						const row = $("<tr/>");
 						row.append($("<td/>").text(quiz.id));
-						row.append($("<td/>").text(quiz.name));
+						row.append($("<td/>").append($("<a/>").attr("href", `/Quiz?id=${quiz.id}`).text(quiz.name)));
 						publisherList.append(row);
 					});
 				},

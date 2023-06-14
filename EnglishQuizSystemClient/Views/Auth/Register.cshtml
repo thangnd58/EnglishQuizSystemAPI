@@ -55,14 +55,14 @@
 	<h2>English Quiz System Register</h2>
 
 	<label>UserName:</label>
-	<input type="text" required>
+	<input type="text" name="username" required>
 
 	<label>Password:</label>
-	<input type="password" id="password" required>
+	<input type="password" name="password" id="password" required>
 
 	<label>Confirm password:</label>
-	<input type="password" id="cf_password" required>
-
+	<input type="password" name="cf_password" id="cf_password" required>
+	<span style="color: red">@ViewBag.Message</span>
 	<button type="submit">Register</button>
 	<a href="/Auth/Login">Login</a>
 	<div class="error"></div>
