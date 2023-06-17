@@ -5,16 +5,18 @@
     <h1>@ViewBag.Quiz.Name</h1>
     <div class="formbold-main-wrapper">
         <div class="formbold-form-wrapper">
-            <form method="post" action="@Url.Action("Submit", "Quiz")" onsubmit="return validateForm()">
-                <input type="hidden" value="ViewBag.Quiz.Id" name="quizId" />
+            <form method="post" action="@Url.Action("Index", "Quiz")" onsubmit="return validateForm()">
+                <input type="hidden" value="@ViewBag.Quiz.Id" name="quizId" />
                 @{
                     var questionNumber = 1;
+                    List<UserAnswer> listUserAnswer = ViewBag.ListUserAnswer;
                 }
+
                 @foreach (var q in ViewBag.ListQuestion)
                 {
                     <div class="formbold-mb-5">
                         <label for="qusOne" class="formbold-form-label">
-                            <h4><span>@questionNumber</span>.<span>@q.Text</span></h4>
+                            <h4><b>Question @questionNumber  (1 point)</b>.<span> @q.Text</span></h4>
                         </label>
 
                         @if (q.Type)
@@ -24,8 +26,8 @@
                                 {
                                     <div class="formbold-radio-group">
                                         <label class="formbold-radio-label">
-                                            <input class="formbold-input-radio" value="@q.Id @a.Id" type="radio" name="qusOne" id="qusOne" />
-                                            @a.Text
+                                            <input class="formbold-input-radio" value="@q.Id @a.Id" type="radio" name="qusOne" id="qusOne" @(listUserAnswer?.FirstOrDefault(x => x.AnswerId == a.Id) != null ? "checked" : "") @(listUserAnswer != null ? "disabled" : "") />
+                                            <span>@a.Text</span>
                                             <span class="formbold-radio-checkmark"></span>
                                         </label>
                                     </div>
@@ -39,20 +41,28 @@
                                 {
                                     <div class="formbold-checkbox-group">
                                         <label class="formbold-checkbox-label">
-                                            <input class="formbold-input-checkbox" value="@q.Id @a.Id" type="checkbox" name="qusMul" id="qusOne_@a.Id" />
-                                            @a.Text
+                                            <input class="formbold-input-checkbox" value="@q.Id @a.Id" type="checkbox" name="qusMul" id="qusOne_@a.Id" @(listUserAnswer?.FirstOrDefault(x => x.AnswerId == a.Id) != null ? "checked" : "") @(listUserAnswer != null ? "disabled" : "") />
+                                            <span>@a.Text</span>
                                             <span class="formbold-checkbox-checkmark"></span>
                                         </label>
                                     </div>
                                 }
                             </div>
                         }
+                        <br/>
+                        @if (listUserAnswer != null)
+                        {
+                            <div>Correct answer is: <b>@q.ToString()</b></div>
+                        }
                         @{
                             questionNumber++;
                         }
                     </div>
                 }
-                <button class="formbold-btn">Submit</button>
+                @if (listUserAnswer == null)
+                {
+                    <button class="formbold-btn">Submit</button>
+                }
             </form>
         </div>
     </div>
