@@ -37,9 +37,11 @@ namespace EnglishQuizSystemClient.Controllers
                 }
 
                 var userAnswers = await GetListUserAnswer(id, user.Id);
+                var userQuiz = await GetUserQuizPoint(id, user.Id);
                 if (userAnswers != null && userAnswers.Count > 0)
                 {
                     ViewBag.ListUserAnswer = userAnswers;
+                    ViewBag.Points = userQuiz.Score;
                 }
 
                 var questionList = await GetQuestionsByQuizIdAsync(id);
@@ -94,7 +96,8 @@ namespace EnglishQuizSystemClient.Controllers
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                var qusOneValue = form["qusOne"];
+                var qusOneValues = form.Where(f => f.Key.StartsWith("qusOne")).SelectMany(f => f.Value); ;
+               
                 var qusMulValue = form["qusMul"];
                 var quizId = int.Parse(form["quizId"]);
 
@@ -106,7 +109,7 @@ namespace EnglishQuizSystemClient.Controllers
                 }
 
                 var listQuestionAnswer = new Dictionary<int, List<int>>();
-                foreach (var qus in qusOneValue.Concat(qusMulValue))
+                foreach (var qus in qusOneValues.Concat(qusMulValue))
                 {
                     var quesAns = qus.Split(' ');
                     var ints = Array.ConvertAll(quesAns, s => int.Parse(s));
@@ -140,9 +143,7 @@ namespace EnglishQuizSystemClient.Controllers
                     ViewBag.Message = "Error submited!";
                     return View();
                 }
-
-                ViewBag.Message = "Submitted! Back to home to view result.";
-                return View();
+                return RedirectToAction("Index", "Quiz", new { id = quizId });
             }
             catch (Exception ex)
             {
@@ -225,6 +226,22 @@ namespace EnglishQuizSystemClient.Controllers
                     {
                         var data = await content.ReadAsStringAsync();
                         return JsonConvert.DeserializeObject<User>(data);
+                    }
+                    return null;
+                }
+            }
+        }
+        
+        private async Task<UserQuiz> GetUserQuizPoint(int quizId, int userId)
+        {
+            using (var res = await _httpClient.GetAsync($"{ApiLinkUserAnswer}/GetGrade?quizId={quizId}&userId={userId}"))
+            {
+                using (var content = res.Content)
+                {
+                    if (res.IsSuccessStatusCode)
+                    {
+                        var data = await content.ReadAsStringAsync();
+                        return JsonConvert.DeserializeObject<UserQuiz>(data);
                     }
                     return null;
                 }

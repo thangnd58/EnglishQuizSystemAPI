@@ -14,6 +14,7 @@ namespace EnglishQuizSystem.Mapper
             CreateMap<Question, QuestionDTO>().ReverseMap();
             CreateMap<Answer, AnswerDTO>().ReverseMap();
             CreateMap<UserAnswer, UserAnswerDTO>().ReverseMap();
+            CreateMap<UserQuiz, UserQuizDTO>().ReverseMap();
         }
     }
 }

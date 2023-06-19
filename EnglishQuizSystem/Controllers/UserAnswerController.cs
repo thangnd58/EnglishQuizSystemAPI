@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace EnglishQuizSystem.Controllers
@@ -52,7 +54,7 @@ namespace EnglishQuizSystem.Controllers
                     _context.UserAnswers.AddRange(_mapper.Map<IEnumerable<UserAnswer>>(userAnswerDTO));
                     _context.SaveChanges();
                     UserAnswerDTO temp = userAnswerDTO.First();
-                    GradeForUser(temp.QuizId, temp.QuizId);
+                    GradeForUser(temp.QuizId, temp.UserId);
                     return Ok("Insert Successfully.");
                 }
 
@@ -68,7 +70,11 @@ namespace EnglishQuizSystem.Controllers
         {
             try
             {
-                return Ok("");
+                using (_context)
+                {
+                    UserQuiz userQuiz = _context.UserQuizzes.FirstOrDefault(x => x.UserId == userId && x.QuizId == quizId);
+                    return (userQuiz == null ? NotFound() : Ok(_mapper.Map<UserQuizDTO>(userQuiz)));
+                }
             }
             catch (Exception ex)
             {
@@ -76,24 +82,45 @@ namespace EnglishQuizSystem.Controllers
             }
         }
 
-        //TO_DO
         private void GradeForUser(int quizId, int userId)
         {
             using (_context)
             {
-                int points = 0;
-                var userAnswers = _context.UserAnswers
-                    .Where(x => x.UserId == userId && x.QuizId == quizId)
-                    .ToList();
+                var query = @"SELECT 
+                              COUNT(*) AS points 
+                            FROM 
+                              (
+                                SELECT 
+                              a.question_id,
+                              STRING_AGG(a.id, ',') AS id
+                            FROM 
+                              answer AS a 
+                            WHERE 
+                              a.is_correct = 1 
+                            GROUP BY 
+                              a.question_id 
+                              ) AS a 
+                              INNER JOIN (
+                                SELECT 
+                                  question_id, 
+                                  STRING_AGG(answer_id, ',') AS answer_id
+                                FROM 
+                                  user_answer AS ua 
+                                WHERE 
+                                  (quiz_id = @quiz_id) 
+                                  AND (user_id = @user_id) 
+                                GROUP BY 
+                                  question_id
+                              ) AS b ON a.question_id = b.question_id 
+                              AND a.id = b.answer_id";
 
-                var keyValuePairs = userAnswers
-                    .GroupBy(x => x.QuestionId)
-                    .ToDictionary(g => g.Key, g => g.Select(x => x.AnswerId).ToList());
-                var listAnswers = _context.Answers.ToList();
-                foreach (var a in keyValuePairs.Values)
-                {
-
-                }
+                var command = _context.Database.GetDbConnection().CreateCommand();
+                command.CommandText = query;
+                command.Parameters.Add(new SqlParameter("@quiz_id", quizId));
+                command.Parameters.Add(new SqlParameter("@user_id", userId));
+                _context.Database.OpenConnection();
+                var points = (int)command.ExecuteScalar();
+                _context.Database.CloseConnection();
                 UserQuiz uq = new UserQuiz();
                 uq.UserId = userId;
                 uq.QuizId = quizId;

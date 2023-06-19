@@ -1,16 +1,20 @@
-﻿
+﻿@{
+    var questionNumber = 1;
+    List<UserAnswer> listUserAnswer = ViewBag.ListUserAnswer;
+}
 <h1>@ViewBag.Message</h1>
 @if (ViewBag.ListQuestion != null)
 {
     <h1>@ViewBag.Quiz.Name</h1>
+    @if (listUserAnswer != null)
+    {
+        <h2>Your grade in this quiz is: @ViewBag.Points/@ViewBag.ListQuestion.Count</h2>
+    }
     <div class="formbold-main-wrapper">
         <div class="formbold-form-wrapper">
             <form method="post" action="@Url.Action("Index", "Quiz")" onsubmit="return validateForm()">
                 <input type="hidden" value="@ViewBag.Quiz.Id" name="quizId" />
-                @{
-                    var questionNumber = 1;
-                    List<UserAnswer> listUserAnswer = ViewBag.ListUserAnswer;
-                }
+                
 
                 @foreach (var q in ViewBag.ListQuestion)
                 {
@@ -26,7 +30,7 @@
                                 {
                                     <div class="formbold-radio-group">
                                         <label class="formbold-radio-label">
-                                            <input class="formbold-input-radio" value="@q.Id @a.Id" type="radio" name="qusOne" id="qusOne" @(listUserAnswer?.FirstOrDefault(x => x.AnswerId == a.Id) != null ? "checked" : "") @(listUserAnswer != null ? "disabled" : "") />
+                                            <input class="formbold-input-radio" value="@q.Id @a.Id" type="radio" name="qusOne @q.Id" id="qusOne" @(listUserAnswer?.FirstOrDefault(x => x.AnswerId == a.Id) != null ? "checked" : "") @(listUserAnswer != null ? "disabled" : "") />
                                             <span>@a.Text</span>
                                             <span class="formbold-radio-checkmark"></span>
                                         </label>
