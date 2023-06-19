@@ -66,7 +66,8 @@ namespace EnglishQuizSystem.Controllers
         }
 
         [HttpGet("GetGrade")]
-        public IActionResult GetGrade(int quizId, int userId)
+		[Authorize(AuthenticationSchemes = "Bearer")]
+		public IActionResult GetGrade(int quizId, int userId)
         {
             try
             {
@@ -81,6 +82,29 @@ namespace EnglishQuizSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete]
+		[Authorize(AuthenticationSchemes = "Bearer")]
+		public IActionResult ReDoQuiz(int quizId, string username)
+        {
+			try
+			{
+				using (_context)
+				{
+                    User u = _context.Users.FirstOrDefault(x => x.UserName.Equals(username));
+                    var listUserAnswers = _context.UserAnswers.Where(x => x.UserId == u.Id && x.QuizId == quizId).ToList();
+                    UserQuiz userQuiz = _context.UserQuizzes.FirstOrDefault(x => x.UserId == u.Id && x.QuizId == quizId);
+                    _context.UserQuizzes.Remove(userQuiz);
+                    _context.UserAnswers.RemoveRange(listUserAnswers);
+                    _context.SaveChanges();
+					return Ok("Delete Successfully.");
+				}
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
 
         private void GradeForUser(int quizId, int userId)
         {

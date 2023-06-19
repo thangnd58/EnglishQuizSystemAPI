@@ -1,88 +1,136 @@
 ﻿@{
-	string token = Context.Session.GetString("token");
+    string token = Context.Session.GetString("token");
+    string username = Context.Session.GetString("username");
 }
 @if (token != "" && token != null)
+{   <h1>Chart</h1>
+    <canvas id="chart"></canvas>
+    <input type="hidden" value="@username" id="username" />
+    <table class="table table-bordered mt-3">
+        <input type="text" placeholder="Search by name..." onchange="search(this.value, 'Name')" />
+        <thead class="thead-light">
+            <tr>
+                <th>Id</th>
+                <th>
+                    Quiz Name
+                </th>
+                <th>Last score</th>
+            </tr>
+        </thead>
+        <tbody id="quiz-list">
+        </tbody>
+    </table>
+}
+else
 {
-	<table class="table table-bordered mt-3">
-		<input type="text" placeholder="Search by name..." onchange="search(this.value, 'Name')" />
-		<thead class="thead-light">
-			<tr>
-				<th>Id</th>
-				<th>
-					Quiz Name
-				</th>
-
-			</tr>
-		</thead>
-		<tbody id="quiz-list">
-		</tbody>
-	</table>
-} else
-{
-	<h1>Please <a href="/Auth/Login" style="text-decoration: none">Login</a> to using.</h1>
+    <h1>Please <a href="/Auth/Login" style="text-decoration: none">Login</a> to using.</h1>
 }
 
+
+
+<script>
+    // Retrieve score statistics from backend API
+    fetch('https://localhost:7280/api/UserQuiz/GetDataScore')
+        .then(response => response.json())
+        .then(data => {
+            const grades = data.map(grade => `${grade.score} point`);
+            const counts = data.map(grade => grade.count);
+
+            // Create a new chart instance
+            const ctx = document.getElementById('chart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: grades,
+                    datasets: [{
+                        label: 'Number user',
+                        data: counts,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+</script>
+
+
 <style>
-	form {
-		margin: 20px;
-		padding: 20px;
-		border: 1px solid #ccc;
-		border-radius: 5px;
-	}
+    canvas {
+        max-width: 800px;
+        margin: 0 auto;
+    }
 
-	input[type="text"] {
-		padding: 8px;
-		margin-bottom: 10px;
-		border: 1px solid #ccc;
-		border-radius: 3px;
-		width: 100%;
-		box-sizing: border-box;
-	}
+    form {
+        margin: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 
-	input[type="date"] {
-		padding: 8px;
-		margin-bottom: 10px;
-		border: 1px solid #ccc;
-		border-radius: 3px;
-		width: 100%;
-		box-sizing: border-box;
-	}
+    input[type="text"] {
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-	select {
-		padding: 8px;
-		margin-bottom: 10px;
-		border: 1px solid #ccc;
-		border-radius: 3px;
-		width: 100%;
-		box-sizing: border-box;
-	}
+    input[type="date"] {
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-	input[type="submit"] {
-		background-color: #008CBA;
-		color: white;
-		padding: 12px 20px;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		font-size: 16px;
-	}
+    select {
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-	input[type="button"] {
-		background-color: #008CBA;
-		color: white;
-		padding: 12px 20px;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		font-size: 16px;
-	}
+    input[type="submit"] {
+        background-color: #008CBA;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
 
-	input[type="submit"]:hover {
-		background-color: #006E9D;
-	}
+    input[type="button"] {
+        background-color: #008CBA;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
 
-	a {
-		text-decoration: none
-	}
+    input[type="submit"]:hover {
+        background-color: #006E9D;
+    }
+
+    a {
+        text-decoration: none
+    }
+
 </style>
 

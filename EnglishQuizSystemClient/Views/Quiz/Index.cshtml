@@ -3,7 +3,7 @@
     List<UserAnswer> listUserAnswer = ViewBag.ListUserAnswer;
 }
 <h1>@ViewBag.Message</h1>
-@if (ViewBag.ListQuestion != null)
+@if (ViewBag.ListQuestion != null && ViewBag.ListQuestion.Count > 0)
 {
     <h1>@ViewBag.Quiz.Name</h1>
     @if (listUserAnswer != null)
@@ -13,7 +13,7 @@
     <div class="formbold-main-wrapper">
         <div class="formbold-form-wrapper">
             <form method="post" action="@Url.Action("Index", "Quiz")" onsubmit="return validateForm()">
-                <input type="hidden" value="@ViewBag.Quiz.Id" name="quizId" />
+                <input type="hidden" value="@ViewBag.Quiz.Id" name="quizId" id="quizId"/>
                 
 
                 @foreach (var q in ViewBag.ListQuestion)
@@ -66,10 +66,16 @@
                 @if (listUserAnswer == null)
                 {
                     <button class="formbold-btn">Submit</button>
+                } else
+                {
+                    <button class="formbold-btn" type="button" onclick="ReDoQuiz()">Try quiz again!</button>
                 }
             </form>
         </div>
     </div>
+} else
+{
+    <h1>Dont have question on this quiz! Try another quiz</h1>
 }
 <script>
     function validateForm() {
