@@ -20,8 +20,8 @@ namespace EnglishQuizSystemClient.Controllers
         {
             try
             {
-                var token = HttpContext.Session.GetString("token");
-                var username = HttpContext.Session.GetString("username");
+                var token = HttpContext.Request.Cookies["token"];
+                var username = HttpContext.Request.Cookies["username"];
                 if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(username))
                 {
                     ViewBag.Message = "Please login!";
@@ -86,9 +86,9 @@ namespace EnglishQuizSystemClient.Controllers
         {
             try
             {
-                var username = HttpContext.Session.GetString("username");
-                var token = HttpContext.Session.GetString("token");
-                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(token))
+				var token = HttpContext.Request.Cookies["token"];
+				var username = HttpContext.Request.Cookies["username"];
+				if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(token))
                 {
                     ViewBag.Message = "Please login!";
                     return View();

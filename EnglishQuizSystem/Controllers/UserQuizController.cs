@@ -18,6 +18,12 @@ namespace EnglishQuizSystem.Controllers
         public int Count { get; set; }
     }
 
+    public class TopAvgPoint
+    {
+        public string UserName { get; set; }
+        public float AvgScore { get; set; }
+    }
+
 
     [Route("api/[controller]")]
 	[ApiController]
@@ -31,25 +37,6 @@ namespace EnglishQuizSystem.Controllers
 			_context = context;
 			_mapper = mapper;
 		}
-
-		//[HttpGet]
-		//[Authorize(AuthenticationSchemes = "Bearer")]
-		//[EnableQuery]
-		//public IActionResult Get()
-		//{
-		//	try
-		//	{
-		//		using (_context)
-		//		{
-		//			var listAllUserQuizzes = _context.UserQuizzes.ToList();
-		//			return (listAllUserQuizzes == null ? NotFound() : Ok(_mapper.Map<IEnumerable<UserQuizDTO>>(listAllUserQuizzes)));
-		//		}
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		return BadRequest("Not found:" + ex.Message);
-		//	}
-		//}
 
 		[HttpGet]
 		[Authorize(AuthenticationSchemes = "Bearer")]
@@ -101,5 +88,45 @@ namespace EnglishQuizSystem.Controllers
                 return BadRequest("Not found:" + ex.Message);
             }
         }
-    }
+
+		[HttpGet("GetTopAvgPoint")]
+		public IActionResult GetTopAvgPoint()
+		{
+			try
+			{
+				using (_context)
+				{
+					var query = @"SELECT top(10) u.user_name,
+									   round(uq.avg_point, 2) as avg_point
+								FROM [user] u
+								JOIN
+								  (SELECT user_id,
+										  sum(score)/count(score) AS avg_point
+								   FROM user_quiz
+								   GROUP BY user_id) uq ON u.id = uq.user_id
+								ORDER BY uq.avg_point DESC;";
+					var command = _context.Database.GetDbConnection().CreateCommand();
+					command.CommandText = query;
+					_context.Database.OpenConnection();
+					var reader = command.ExecuteReader();
+
+					var topAvgPoints = new List<TopAvgPoint>();
+					while (reader.Read())
+					{
+						var username = reader.GetString(0);
+						var avgpoint = reader.GetDouble(1);
+						topAvgPoints.Add(new TopAvgPoint { UserName = username, AvgScore = (float) avgpoint});
+					}
+
+					_context.Database.CloseConnection();
+
+					return Ok(topAvgPoints);
+				}
+			}
+			catch (Exception ex)
+			{
+				return BadRequest("Not found:" + ex.Message);
+			}
+		}
+	}
 }

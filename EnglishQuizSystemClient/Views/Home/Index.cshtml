@@ -1,136 +1,315 @@
 ﻿@{
-    string token = Context.Session.GetString("token");
-    string username = Context.Session.GetString("username");
+	string token = Context.Request.Cookies["token"];
+	string username = Context.Request.Cookies["username"];
 }
 @if (token != "" && token != null)
-{   <h1>Chart</h1>
-    <canvas id="chart"></canvas>
-    <input type="hidden" value="@username" id="username" />
-    <table class="table table-bordered mt-3">
-        <input type="text" placeholder="Search by name..." onchange="search(this.value, 'Name')" />
-        <thead class="thead-light">
-            <tr>
-                <th>Id</th>
-                <th>
-                    Quiz Name
-                </th>
-                <th>Last score</th>
-            </tr>
-        </thead>
-        <tbody id="quiz-list">
-        </tbody>
-    </table>
+{
+	<div class="container">
+		<div class="chart-container">
+			
+			<h1>Statistic</h1>
+			<select id="chart-select">
+				<option selected value="chart3">Top Avg Points</option>
+				<option value="chart">Bar Chart</option>
+				<option value="chart1">Line Chart</option>
+				<option value="chart2">Donut Chart</option>
+			</select>
+			<canvas id="chart" style="display: none"></canvas>
+			<canvas id="chart1" style="display: none"></canvas>
+			<canvas id="chart2" style="display: none"></canvas>
+			<div id="chart3" style="display: block">
+				<table>
+					<thead>
+						<tr>
+							<th>Rank</th>
+							<th>Name</th>
+							<th>Avg Points</th>
+						</tr>
+					</thead>
+					<tbody id="top-avg-list">
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="table-container">
+			<h1>Quiz</h1>
+			<table>
+				<input type="text" placeholder="Search quiz by name..." onchange="search(this.value, 'Name')" />
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Quiz Name</th>
+						<th>Last score</th>
+					</tr>
+				</thead>
+				<tbody id="quiz-list">
+				</tbody>
+			</table>
+		</div>
+	</div>
 }
 else
 {
-    <h1>Please <a href="/Auth/Login" style="text-decoration: none">Login</a> to using.</h1>
+	<h1>Please <a href="/Auth/Login" style="text-decoration: none">Login</a> to using.</h1>
 }
 
 
 
 <script>
-    // Retrieve score statistics from backend API
-    fetch('https://localhost:7280/api/UserQuiz/GetDataScore')
-        .then(response => response.json())
-        .then(data => {
-            const grades = data.map(grade => `${grade.score} point`);
-            const counts = data.map(grade => grade.count);
 
-            // Create a new chart instance
-            const ctx = document.getElementById('chart').getContext('2d');
-            const chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: grades,
-                    datasets: [{
-                        label: 'Number user',
-                        data: counts,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    }
-                }
-            });
-        });
+	const chartSelect = document.getElementById('chart-select');
+	const charts = {
+		chart: document.getElementById('chart'),
+		chart1: document.getElementById('chart1'),
+		chart2: document.getElementById('chart2'),
+		chart3: document.getElementById('chart3')
+	};
+
+	chartSelect.addEventListener('change', () => {
+		Object.values(charts).forEach(chart => {
+			chart.style.display = 'none';
+		});
+		charts[chartSelect.value].style.display = 'block';
+	});
+
+	function getRandomColor() {
+		const r = Math.floor(Math.random() * 256);
+		const g = Math.floor(Math.random() * 256);
+		const b = Math.floor(Math.random() * 256);
+		return `rgb(${r}, ${g}, ${b})`;
+	}
+
+	const backgroundColor = [];
+	for (let i = 0; i < 12; i++) {
+		backgroundColor.push(getRandomColor());
+	}
+
+	// Retrieve score statistics from backend API
+	fetch('https://localhost:7280/api/UserQuiz/GetDataScore')
+		.then(response => response.json())
+		.then(data => {
+			const grades = data.map(grade => `${grade.score} point`);
+			const counts = data.map(grade => grade.count);
+
+			// Create a new chart instance
+			const ctx = document.getElementById('chart').getContext('2d');
+			const ctx1 = document.getElementById('chart1').getContext('2d');
+			const ctx2 = document.getElementById('chart2').getContext('2d');
+			const chart = new Chart(ctx, {
+				type: 'bar',
+				data: {
+					labels: grades,
+					datasets: [{
+						label: 'Number user',
+						data: counts,
+						backgroundColor: backgroundColor,
+						borderColor: 'rgba(54, 162, 235, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: true
+							}
+						}]
+					}
+				}
+			});
+			const chart1 = new Chart(ctx1, {
+				type: 'line',
+				data: {
+					labels: grades,
+					datasets: [{
+						label: 'Number user',
+						data: counts,
+						backgroundColor: backgroundColor,
+						borderColor: 'rgba(54, 162, 235, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: true
+							}
+						}]
+					}
+				}
+			});
+
+			const chart2 = new Chart(ctx2, {
+				type: 'doughnut',
+				data: {
+					labels: grades,
+					datasets: [{
+						label: 'Number user',
+						data: counts,
+						backgroundColor: backgroundColor,
+						borderColor: 'rgba(54, 162, 235, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								beginAtZero: true
+							}
+						}]
+					}
+				}
+			});
+
+		});
 </script>
 
 
 <style>
-    canvas {
-        max-width: 800px;
-        margin: 0 auto;
-    }
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
 
-    form {
-        margin: 20px;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
+	caption {
+		font-size: 1.5em;
+		font-weight: bold;
+		margin-bottom: 10px;
+	}
 
-    input[type="text"] {
-        padding: 8px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        width: 100%;
-        box-sizing: border-box;
-    }
+	th, td {
+		text-align: left;
+		padding: 8px;
+		border-bottom: 1px solid #ddd;
+	}
 
-    input[type="date"] {
-        padding: 8px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        width: 100%;
-        box-sizing: border-box;
-    }
+	th {
+		background-color: #f2f2f2;
+		font-weight: bold;
+	}
 
-    select {
-        padding: 8px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        width: 100%;
-        box-sizing: border-box;
-    }
+	tr:nth-child(even) {
+		background-color: #f2f2f2;
+	}
 
-    input[type="submit"] {
-        background-color: #008CBA;
-        color: white;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-    }
+	tr:hover {
+		background-color: #ddd;
+	}
 
-    input[type="button"] {
-        background-color: #008CBA;
-        color: white;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-    }
+	.container {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		margin: 10px;
+	}
 
-    input[type="submit"]:hover {
-        background-color: #006E9D;
-    }
+	.chart-container {
+		width: 100%;
+		margin-right: 10px;
+	}
 
-    a {
-        text-decoration: none
-    }
+	.table-container {
+		width: 60%;
+	}
+
+		.table-container table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		.table-container th,
+		.table-container td {
+			padding: 10px;
+			border: 1px solid #ccc;
+		}
+
+		.table-container th {
+			background-color: #f2f2f2;
+		}
+
+	canvas {
+		width: 100%;
+		max-height: 400px;
+		border: 1px solid black;
+		margin-bottom: 10px;
+	}
+
+	.chart-container canvas {
+		width: 100%;
+	}
+
+
+	.table-container table {
+		width: 59vw;
+	}
+
+	.table-container th,
+	.table-container td {
+		padding: 15px;
+		font-size: 16px;
+	}
+
+	form {
+		margin: 20px;
+		padding: 20px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+	}
+
+	input[type="text"] {
+		padding: 8px;
+		margin-bottom: 10px;
+		border: 1px solid #ccc;
+		border-radius: 3px;
+		box-sizing: border-box;
+	}
+
+	input[type="date"] {
+		padding: 8px;
+		margin-bottom: 10px;
+		border: 1px solid #ccc;
+		border-radius: 3px;
+		box-sizing: border-box;
+	}
+
+	select {
+		padding: 8px;
+		margin-bottom: 10px;
+		border: 1px solid #ccc;
+		border-radius: 3px;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	input[type="submit"] {
+		background-color: #008CBA;
+		color: white;
+		padding: 12px 20px;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 16px;
+	}
+
+	input[type="button"] {
+		background-color: #008CBA;
+		color: white;
+		padding: 12px 20px;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 16px;
+	}
+
+	input[type="submit"]:hover {
+		background-color: #006E9D;
+	}
+
+	a {
+		text-decoration: none
+	}
 
 </style>
 

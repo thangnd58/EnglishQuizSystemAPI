@@ -56,12 +56,13 @@
                         <br/>
                         @if (listUserAnswer != null)
                         {
-                            <div>Correct answer is: <b>@q.ToString()</b></div>
+                            <div style="border: 2px solid; padding: 10px">Correct answer is: <b>@q.ToString()</b></div>
                         }
                         @{
                             questionNumber++;
                         }
                     </div>
+                    <hr/>
                 }
                 @if (listUserAnswer == null)
                 {

@@ -1,7 +1,7 @@
 ﻿@using Newtonsoft.Json;
 @{
-	string token = Context.Session.GetString("token");
-	string username = Context.Session.GetString("username");
+	string token = Context.Request.Cookies["token"];
+	string username = Context.Request.Cookies["username"];
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +33,8 @@
 							<li class="nav-item">
 								<a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">Login</a>
 							</li>
-						} else
+						}
+						else
 						{
 							<li class="nav-item">
 								<a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Logout">@username (Logout)</a>
@@ -45,7 +46,6 @@
 		</nav>
 	</header>
 	<div class="container">
-		<input type="hidden" value="@token" id="token" />
 		<main role="main" class="pb-3">
 			@RenderBody()
 		</main>
@@ -59,15 +59,14 @@
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
-	<script type="text/javascript">
-		var token = $('#token').val();
-		window.localStorage.setItem("token", token);
-	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 	<script>
-		var bearer = 'Bearer ' + localStorage.getItem("token");
-		var username = $("#username").val();
+		var tokenValue = $.cookie("token");
+		var bearer = 'Bearer ' + tokenValue;
+		var username = $.cookie("username");
 		const publisherList = $("#quiz-list");
+		const topAvgList = $("#top-avg-list");
 		$.ajax({
 			url: `https://localhost:7280/api/Quiz`,
 			type: "GET",
@@ -88,10 +87,9 @@
 						headers: { Authorization: bearer },
 						dataType: "json",
 						success: function (scoreData) {
-							console.log(scoreData);
 							row.append($("<td/>").text(scoreData));
 						},
-						error: function (jqXHR, textStatus, errorThrown) {
+						error: function () {
 							row.append($("<td/>").append($("<a/>").attr("href", `/Quiz?id=${quiz.id}`).text("Not yet. Do quiz now")));
 						}
 					});
@@ -102,6 +100,26 @@
 			}
 		});
 
+		$.ajax({
+			url: `https://localhost:7280/api/UserQuiz/GetTopAvgPoint`,
+			type: "GET",
+			headers: { Authorization: bearer },
+			dataType: "json",
+			success: function (data) {
+				// Clear the previous results
+				topAvgList.empty();
+				// Iterate over the data and create a new row for each publisher
+				$.each(data, function (index, result) {
+					const row = $("<tr/>");
+					row.append($("<td/>").text(++index));
+					row.append($("<td/>").text(result.userName));
+					row.append($("<td/>").text(result.avgScore));
+					topAvgList.append(row);
+				});
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+			}
+		});
 
 		function search(txt, type) {
 			const publisherList = $("#quiz-list");

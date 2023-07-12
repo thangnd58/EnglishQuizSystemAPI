@@ -38,8 +38,13 @@ namespace EnglishQuizSystemClient.Controllers
 								JObject jsonData = JsonConvert.DeserializeObject<JObject>(data);
 								// Access properties of the JSON object as needed
 								string token = jsonData["token"].ToString();
-								HttpContext.Session.SetString("token", token);
-								HttpContext.Session.SetString("username", username);
+								//HttpContext.Session.SetString("token", token);
+								//HttpContext.Session.SetString("username", username);
+								var cookieOptions = new CookieOptions();
+								cookieOptions.Expires = DateTime.Now.AddDays(1);
+								cookieOptions.Path = "/";
+								Response.Cookies.Append("token", token, cookieOptions);
+								Response.Cookies.Append("username", username, cookieOptions);
 								return RedirectToAction("Index", "Home");
 							}
 							else
@@ -112,9 +117,9 @@ namespace EnglishQuizSystemClient.Controllers
 
 		public IActionResult Logout()
 		{
-			HttpContext.Session.Remove("token");
-            HttpContext.Session.Remove("username");
-            return RedirectToAction("Index", "Home");
+			Response.Cookies.Delete("token");
+			Response.Cookies.Delete("username");
+			return RedirectToAction("Index", "Home");
 		}
 	}
 }
