@@ -37,6 +37,9 @@
 						else
 						{
 							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="QuizManagement" asp-action="Index">Quiz Management</a>
+							</li>
+							<li class="nav-item">
 								<a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Logout">@username (Logout)</a>
 							</li>
 						}
@@ -81,6 +84,7 @@
 					const row = $("<tr/>");
 					row.append($("<td/>").text(quiz.id));
 					row.append($("<td/>").append($("<a/>").attr("href", `/Quiz?id=${quiz.id}`).text(quiz.name)));
+					
 					$.ajax({
 						url: `https://localhost:7280/api/UserQuiz?quizId=${quiz.id}&username=${username}`,
 						type: "GET",
@@ -88,9 +92,25 @@
 						dataType: "json",
 						success: function (scoreData) {
 							row.append($("<td/>").text(scoreData));
+							const button = $("<button/>").addClass("btn-primary").text("Review").click(function () {
+								window.location.href = `/Quiz?id=${quiz.id}`;
+							}).css({
+								"border-radius": "5px",
+								"width": "100px",
+								"height": "40px"
+							});
+							row.append($("<td/>").append(button));
 						},
 						error: function () {
-							row.append($("<td/>").append($("<a/>").attr("href", `/Quiz?id=${quiz.id}`).text("Not yet. Do quiz now")));
+							row.append($("<td/>").text("Not yet."));
+							const button = $("<button/>").addClass("btn-primary").text("Do Quiz").click(function () {
+								window.location.href = `/Quiz?id=${quiz.id}`;
+							}).css({
+								"border-radius": "5px",
+								"width": "100px",
+								"height": "40px"
+							});
+							row.append($("<td/>").append(button));
 						}
 					});
 					publisherList.append(row);
@@ -139,6 +159,7 @@
 						const row = $("<tr/>");
 						row.append($("<td/>").text(quiz.id));
 						row.append($("<td/>").append($("<a/>").attr("href", `/Quiz?id=${quiz.id}`).text(quiz.name)));
+
 						$.ajax({
 							url: `https://localhost:7280/api/UserQuiz?quizId=${quiz.id}&username=${username}`,
 							type: "GET",
@@ -146,9 +167,25 @@
 							dataType: "json",
 							success: function (scoreData) {
 								row.append($("<td/>").text(scoreData));
+								const button = $("<button/>").addClass("btn-primary").text("Review").click(function () {
+									window.location.href = `/Quiz?id=${quiz.id}`;
+								}).css({
+									"border-radius": "5px",
+									"width": "100px",
+									"height": "40px"
+								});
+								row.append($("<td/>").append(button));
 							},
-							error: function (jqXHR, textStatus, errorThrown) {
-								row.append($("<td/>").append($("<a/>").attr("href", `/Quiz?id=${quiz.id}`).text("Not yet. Do quiz now")));
+							error: function () {
+								row.append($("<td/>").text("Not yet."));
+								const button = $("<button/>").addClass("btn-primary").text("Do Quiz").click(function () {
+									window.location.href = `/Quiz?id=${quiz.id}`;
+								}).css({
+									"border-radius": "5px",
+									"width": "100px",
+									"height": "40px"
+								});
+								row.append($("<td/>").append(button));
 							}
 						});
 						publisherList.append(row);
@@ -174,6 +211,7 @@
 			});
 		}
 	</script>
+
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

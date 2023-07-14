@@ -1,5 +1,5 @@
 <div class="formbold-main-wrapper">
-  
+
   <div class="formbold-form-wrapper">
     <div>Quiz Name</div>
     <form>
@@ -127,6 +127,30 @@
     </form>
   </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+<script>
+  $.ajax({
+    type: "POST",
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("Authorization", "Bearer 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");
+    },
+    url: "https://api.openai.com/v1/engines/text-davinci-002/completions",
+    data: JSON.stringify({
+      prompt: "Once upon a time,",
+      max_tokens: 1024,
+      n: 1,
+      temperature: 0.5,
+    }),
+    success: function (response) {
+      const generated_text = response.choices[0].text;
+      console.log(generated_text);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.error(errorThrown);
+    }
+  });
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
