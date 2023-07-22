@@ -69,7 +69,7 @@ namespace EnglishQuizSystemClient.Controllers
                     question.Answers = answerList;
                 }
 
-                ViewBag.ListQuestion = questionList;
+                ViewBag.ListQuestion = questionList.Where(x => x.Active == true).ToList();
                 ViewBag.Quiz = quiz;
             }
             catch (Exception ex)

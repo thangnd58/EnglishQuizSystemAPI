@@ -37,9 +37,6 @@
 						else
 						{
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-controller="QuizManagement" asp-action="Index">Quiz Management</a>
-							</li>
-							<li class="nav-item">
 								<a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Logout">@username (Logout)</a>
 							</li>
 						}
@@ -84,7 +81,7 @@
 					const row = $("<tr/>");
 					row.append($("<td/>").text(quiz.id));
 					row.append($("<td/>").append($("<a/>").attr("href", `/Quiz?id=${quiz.id}`).text(quiz.name)));
-					
+
 					$.ajax({
 						url: `https://localhost:7280/api/UserQuiz?quizId=${quiz.id}&username=${username}`,
 						type: "GET",
@@ -92,28 +89,66 @@
 						dataType: "json",
 						success: function (scoreData) {
 							row.append($("<td/>").text(scoreData));
-							const button = $("<button/>").addClass("btn-primary").text("Review").click(function () {
+
+							// Create a new Review button with a click event
+							const reviewButton = $("<button/>").addClass("btn-primary").text("Review").click(function () {
 								window.location.href = `/Quiz?id=${quiz.id}`;
 							}).css({
 								"border-radius": "5px",
 								"width": "100px",
 								"height": "40px"
 							});
-							row.append($("<td/>").append(button));
+
+							// Create a new Delete button with a click event
+							const editButton = $("<button/>").addClass("btn-danger").text("Edit Quiz").click(function () {
+								window.location.href = `http://localhost:5206/QuizManagement?id=${quiz.id}`
+							}).css({
+								"border-radius": "5px",
+								"width": "100px",
+								"height": "40px",
+								"margin-left": "10px"
+							});
+
+							// Create a new table cell and append the Do Quiz and Delete buttons to it
+							var doQuizTd = $("<td/>").append(reviewButton);
+							if (username == 'admin') {
+								doQuizTd.append(editButton);
+							}
+							row.append(doQuizTd);
 						},
 						error: function () {
 							row.append($("<td/>").text("Not yet."));
-							const button = $("<button/>").addClass("btn-primary").text("Do Quiz").click(function () {
+
+							// Create a new Do Quiz button with a click event
+							const doQuizButton = $("<button/>").addClass("btn-primary").text("Do Quiz").click(function () {
 								window.location.href = `/Quiz?id=${quiz.id}`;
 							}).css({
 								"border-radius": "5px",
 								"width": "100px",
 								"height": "40px"
 							});
-							row.append($("<td/>").append(button));
+
+							// Create a new Delete button with a click event
+							const editButton = $("<button/>").addClass("btn-danger").text("Edit Quiz").click(function () {
+								window.location.href = `http://localhost:5206/QuizManagement?id=${quiz.id}`
+							}).css({
+								"border-radius": "5px",
+								"width": "100px",
+								"height": "40px",
+								"margin-left": "10px"
+							});
+
+							// Create a new table cell and append the Do Quiz and Delete buttons to it
+							var doQuizTd = $("<td/>").append(doQuizButton);
+							if (username == 'admin') {
+								doQuizTd.append(editButton);
+							}
+							row.append(doQuizTd);
 						}
 					});
-					publisherList.append(row);
+					if (quiz.active || username == 'admin') {
+						publisherList.append(row);
+					}
 				});
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
@@ -174,7 +209,21 @@
 									"width": "100px",
 									"height": "40px"
 								});
-								row.append($("<td/>").append(button));
+								// Create a new Delete button with a click event
+								const editButton = $("<button/>").addClass("btn-danger").text("Edit Quiz").click(function () {
+									window.location.href = `http://localhost:5206/QuizManagement?id=${quiz.id}`
+								}).css({
+									"border-radius": "5px",
+									"width": "100px",
+									"height": "40px",
+									"margin-left": "10px"
+								});
+								// Create a new table cell and append the Do Quiz and Delete buttons to it
+								var doQuizTd = $("<td/>").append(button);
+								if (username == 'admin') {
+									doQuizTd.append(editButton);
+								}
+								row.append(doQuizTd);
 							},
 							error: function () {
 								row.append($("<td/>").text("Not yet."));
@@ -185,10 +234,25 @@
 									"width": "100px",
 									"height": "40px"
 								});
-								row.append($("<td/>").append(button));
+								// Create a new Delete button with a click event
+								const editButton = $("<button/>").addClass("btn-danger").text("Edit Quiz").click(function () {
+									window.location.href = `http://localhost:5206/QuizManagement?id=${quiz.id}`
+								}).css({
+									"border-radius": "5px",
+									"width": "100px",
+									"height": "40px",
+									"margin-left": "10px"
+								});
+								var doQuizTd = $("<td/>").append(button);
+								if (username == 'admin') {
+									doQuizTd.append(editButton);
+								}
+								row.append(doQuizTd);
 							}
 						});
-						publisherList.append(row);
+						if (quiz.active || username == 'admin') {
+							publisherList.append(row);
+						}
 					});
 				},
 				error: function (jqXHR, textStatus, errorThrown) {

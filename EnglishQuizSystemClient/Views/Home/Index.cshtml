@@ -6,7 +6,7 @@
 {
 	<div class="container">
 		<div class="chart-container">
-			
+
 			<h1>Statistics</h1>
 			<select id="chart-select">
 				<option selected value="chart3">Top Avg Points</option>
@@ -34,7 +34,17 @@
 		<div class="table-container">
 			<h1>Quiz</h1>
 			<table>
-				<input type="text" placeholder="Search quiz by name..." onchange="search(this.value, 'Name')" />
+				<div class="row mb-2">
+					<div class="col-md-10">
+						<input type="text" placeholder="Search quiz by name..." class="form-control" onchange="search(this.value, 'Name')" />
+					</div>
+					@if (username == "admin")
+					{
+						<div class="col-md-2">
+							<button class="btn btn-primary" onclick="showModalAdd()">Add Quiz</button>
+						</div>
+					}
+				</div>
 				<thead>
 					<tr>
 						<th>Id</th>
@@ -54,9 +64,59 @@ else
 	<h1>Please <a href="/Auth/Login" style="text-decoration: none">Login</a> to using.</h1>
 }
 
+<div class="modal fade" id="modalAddNewQuiz" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+	 aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header text-center">
+				<h4 class="modal-title w-100 font-weight-bold">Add new quiz</h4>
+			</div>
+			<div class="modal-body mx-3">
+				<div class="md-form mb-1">
+					<i class="fas fa-user prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-name">Quiz Name</label>
+					<input type="text" id="quizName" class="form-control validate">
+				</div>
+				<div class="md-form mb-2">
+					<i class="fas fa-envelope prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-email">Active</label>
+					<input id="quizActive" type="checkbox">
+				</div>
+			</div>
+			<div class="modal-footer d-flex justify-content-center">
+				<button class="btn btn-deep-orange" onclick="addNewQuiz()">Save</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 
 
 <script>
+	function showModalAdd() {
+		$("#modalAddNewQuiz").modal("show");
+	}
+
+	function addNewQuiz() {
+		var obj = {
+			id: 0,
+			name: $("#quizName").val(),
+			codeActive: "123456",
+			active: $('#quizActive').is(":checked") ? true : false,
+		}
+		$.ajax({
+			url: `https:localhost:7280/api/Quiz`,
+			type: "POST",
+			headers: { Authorization: bearer },
+			contentType: "application/json",
+			data: JSON.stringify(obj),
+			success: function (data) {
+				window.location.reload();
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+			}
+		});
+	}
 
 	const chartSelect = document.getElementById('chart-select');
 	const charts = {
@@ -257,14 +317,6 @@ else
 		padding: 20px;
 		border: 1px solid #ccc;
 		border-radius: 5px;
-	}
-
-	input[type="text"] {
-		padding: 8px;
-		margin-bottom: 10px;
-		border: 1px solid #ccc;
-		border-radius: 3px;
-		box-sizing: border-box;
 	}
 
 	input[type="date"] {

@@ -8,5 +8,6 @@
 		public bool? Active { get; set; }
 		public bool? Type { get; set; }
 		public int? Difficulty { get; set; }
+		public ICollection<AnswerDTO> Answers { get; set; }
 	}
 }

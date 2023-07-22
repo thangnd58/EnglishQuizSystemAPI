@@ -1,6 +1,242 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-<h1>Div</h1>
+﻿<div class="d-flex align-items-center">
+	<form class="form-inline" method="post" action="@Url.Action("Edit", "QuizManagement")">
+		<div class="row">
+			<div class="col-md-8">
+				<label class="form-check-label" for="exampleCheck1">Quiz Id</label>
+				<input type="text" class="form-control" id="quizId" name="quizId" value="@ViewBag.Quiz.Id" readonly/>
+				<label class="form-check-label" for="exampleCheck1">Quiz Name</label>
+				<input type="text" class="form-control" id="quizName" value="@ViewBag.Quiz.Name" name="quizName" />
+				<label class="form-check-label" for="exampleCheck1">Active</label>
+				<input type="checkbox" class="form-check-input" id="quizActive" @(ViewBag.Quiz.Active?"checked":"") name="quizActive" />
+			</div>
+			<div class="col-md-4">
+				<button type="submit" class="btn btn-primary mt-4">Save</button>
+			</div>
+		</div>
+	</form>
+</div>
+<div>
+
+	<h1>Question management</h1>
+	<input type="hidden" value="" id="selectedQuestion" />
+	<button class="btn btn-primary" onclick="showModalAdd()">Add new question</button>
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">Id</th>
+				<th scope="col">Text</th>
+				<th scope="col">Active</th>
+				<th scope="col">Type</th>
+				<th scope="col">Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var q in ViewBag.Questions)
+			{
+				<tr>
+					<th scope="row">@q.Id</th>
+					<td class="w-50">@q.Text</td>
+					<td>
+						<input type="checkbox" @(q.Active?"checked":"") id="cb_@q.Id" />
+					</td>
+					<td>
+						@if (q.Type)
+						{
+							<span>Single Choice</span>
+						}
+						else
+						{
+							<span>Multiple Choices</span>
+						}
+					</td>
+					<td>
+						<button class="btn btn-primary" onclick="showModalUpdate(@q.Id)">Edit</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+
+<div class="modal fade" id="modalRegisterForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+	 aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header text-center">
+				<h4 class="modal-title w-100 font-weight-bold">Add new question</h4>
+			</div>
+			<div class="modal-body mx-3">
+				<div class="md-form mb-1">
+					<i class="fas fa-user prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-name">Question Text</label>
+					<input type="text" id="qusText" class="form-control validate">
+				</div>
+				<div class="md-form mb-2">
+					<i class="fas fa-envelope prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-email">Active</label>
+					<input id="qusActive" type="checkbox" checked>
+				</div>
+				<div class="md-form mb-2">
+					<i class="fas fa-envelope prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-email">Single choice</label>
+					<input type="radio" id="qusTypeSingle" name="type" />
+					<label data-error="wrong" data-success="right" for="orangeForm-email">Multiple choices</label>
+					<input type="radio" id="qusTypeMultiple" name="type" />
+				</div>
+				<div class="md-form mb-2">
+					<i class="fas fa-envelope prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-email">Answers writed follow format: <b>AnswerText|IsCorrect</b></label>
+					<textarea id="answers" class="form-control" style="height: 200px;"></textarea>
+				</div>
+			</div>
+			<div class="modal-footer d-flex justify-content-center">
+				<button class="btn btn-deep-orange" onclick="addNewQuestion()">Save</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="modalUpdateQuestion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+	 aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header text-center">
+				<h4 class="modal-title w-100 font-weight-bold">Update question</h4>
+			</div>
+			<div class="modal-body mx-3">
+				<div class="md-form mb-1">
+					<i class="fas fa-user prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-name">Question Text</label>
+					<input type="text" id="qusTextUpdate" class="form-control validate">
+				</div>
+				<div class="md-form mb-2">
+					<i class="fas fa-envelope prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-email">Active</label>
+					<input id="qusActiveUpdate" type="checkbox">
+				</div>
+				<div class="md-form mb-2">
+					<i class="fas fa-envelope prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-email">Single choice</label>
+					<input type="radio" id="qusTypeSingleUpdate" name="type" checked />
+					<label data-error="wrong" data-success="right" for="orangeForm-email">Multiple choices</label>
+					<input type="radio" id="qusTypeMultipleUpdate" name="type" />
+				</div>
+				<div class="md-form mb-2">
+					<i class="fas fa-envelope prefix grey-text"></i>
+					<label data-error="wrong" data-success="right" for="orangeForm-email">Answers writed follow format: <b>AnswerId|AnswerText|IsCorrect</b></label>
+					<textarea id="answersUpdate" class="form-control" style="height: 200px;"></textarea>
+				</div>
+			</div>
+			<div class="modal-footer d-flex justify-content-center">
+				<button class="btn btn-deep-orange" onclick="updateQuestion()">Save</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	function showModalAdd() {
+		$('#modalRegisterForm').modal('show');
+	}
+
+	function showModalUpdate(id) {
+		$('#selectedQuestion').val(id);
+		$.ajax({
+			url: `https://localhost:7280/api/Question/${id}`,
+			type: "GET",
+			headers: { Authorization: bearer },
+			dataType: "json",
+			success: function (data) {
+				$("#qusTextUpdate").val(data.text);
+				$("#qusActiveUpdate").prop("checked", data.active);
+				data.type ? $("#qusTypeSingleUpdate").prop("checked", true) : $("#qusTypeMultipleUpdate").prop("checked", true);
+				const formattedAnswers = data.answers.map(answer => `${answer.id}|${answer.text}|${answer.isCorrect}`).join('\n');
+				$("#answersUpdate").val(formattedAnswers);
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+			}
+		});
+		$('#modalUpdateQuestion').modal('show');
+	}
+
+	function updateQuestion() {
+		let params = new URLSearchParams(document.location.search);
+		let quizId = params.get("id");
+		const textContent = $("#answersUpdate").val();
+		const answerValuePairs = textContent.trim().split('\n').map(pair => pair.trim().split('|'));
+		var questionId = $('#selectedQuestion').val();
+		const answers = answerValuePairs.map(pair => ({
+			id: JSON.parse(pair[0]),
+			questionId: questionId,
+			text: pair[1],
+			isCorrect: JSON.parse(pair[2])
+		}));
+		var obj = {
+			quizId: quizId,
+			text: $("#qusTextUpdate").val(),
+			active: $('#qusActiveUpdate').is(":checked") ? true : false,
+			type: $('#qusTypeSingleUpdate').is(":checked") ? true : false,
+			difficulty: 0,
+			answers: answers
+		};
+		$.ajax({
+			url: `https:localhost:7280/api/Question/${questionId}`,
+			type: "PUT",
+			headers: { Authorization: bearer },
+			contentType: "application/json",
+			data: JSON.stringify(obj),
+			success: function (data) {
+				window.location.reload();
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+			}
+		});
+	}
+
+	function addNewQuestion() {
+		let params = new URLSearchParams(document.location.search);
+		let quizId = params.get("id");
+		const textContent = $("#answers").val();
+		const answerValuePairs = textContent.trim().split('\n').map(pair => pair.trim().split('|'));
+
+		var obj = {
+			quizId: quizId,
+			text: $("#qusText").val(),
+			active: $('#qusActive').is(":checked") ? true : false,
+			type: $('#qusTypeSingle').is(":checked") ? true : false,
+			difficulty: 0,
+			answers: []
+		};
+		console.log(obj);
+		$.ajax({
+			url: `https:localhost:7280/api/Question`,
+			type: "POST",
+			headers: { Authorization: bearer },
+			contentType: "application/json",
+			data: JSON.stringify(obj),
+			success: function (data) {
+				var questionId = data.id;
+				const answers = answerValuePairs.map(pair => ({
+					id: 0,
+					questionId: questionId,
+					text: pair[0],
+					isCorrect: JSON.parse(pair[1])
+				}));
+				$.each(answers, function (index, answer) {
+					$.ajax({
+						url: `https:localhost:7280/api/Answer`,
+						type: "POST",
+						headers: { Authorization: bearer },
+						contentType: "application/json",
+						data: JSON.stringify(answer),
+						success: function (data) {
+
+						}
+					});
+				});
+				window.location.reload();
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+			}
+		});
+	}
+</script>

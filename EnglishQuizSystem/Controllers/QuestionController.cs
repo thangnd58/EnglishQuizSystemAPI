@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace EnglishQuizSystem.Controllers
@@ -31,7 +32,7 @@ namespace EnglishQuizSystem.Controllers
 			{
 				using (_context)
 				{
-					var listAllQuestions = _context.Questions.ToList();
+					var listAllQuestions = _context.Questions.Include(s => s.Answers).ToList();
 					return (listAllQuestions == null ? NotFound() : Ok(_mapper.Map<IEnumerable<QuestionDTO>>(listAllQuestions)));
 				}
 			}
@@ -49,7 +50,7 @@ namespace EnglishQuizSystem.Controllers
 			{
 				using (_context)
 				{
-					var question = _context.Questions.FirstOrDefault(q => q.Id == questionId);
+					var question = _context.Questions.Include(s => s.Answers).FirstOrDefault(q => q.Id == questionId);
 					return (question == null ? NotFound() : Ok(_mapper.Map<QuestionDTO>(question)));
 				}
 			}
@@ -70,7 +71,7 @@ namespace EnglishQuizSystem.Controllers
 				{
 					_context.Questions.Add(_mapper.Map<Question>(question));
 					_context.SaveChanges();
-					return Ok("Insert Successfully.");
+					return Ok(_context.Questions.OrderBy(s => s.Id).LastOrDefault());
 				}
 			}
 			catch (Exception ex)
@@ -95,6 +96,7 @@ namespace EnglishQuizSystem.Controllers
 					old.Active = question.Active;
 					old.Type = question.Type;
 					old.Difficulty = question.Difficulty;
+					old.Answers = _mapper.Map<List<Answer>>(question.Answers);
 					_context.SaveChanges();
 					return Ok("Update Successfully.");
 				}
